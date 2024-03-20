@@ -29,16 +29,27 @@ const Home: React.FC = () => {
     socket.on('connect', () => {
       console.log('Connected to the server');
       console.log(`form data: ${formData}`);
-      const reader = new FileReader();
-            reader.onload = () => {
-                const fileData = reader.result as ArrayBuffer;
-                socket.emit('send_file', { filename: file.name, file_data: new Uint8Array(fileData) });
-                console.log(file.name);
-                console.log("sending information");
-                // socket.emit('file_upload', { file, file_data: new Uint8Array(fileData) });
-                // console.log('File uploaded:', file);
-            };
-            reader.readAsArrayBuffer(file);
+      const CHUNK_SIZE = 1024 * 512; // 0.5MB
+      const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+      const fileId = `${file.name}-${Date.now()}`; // Unique ID for the file upload
+
+      for (let i = 0; i < totalChunks; i++) {
+        const blob = file.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const base64Content = e.target.result.split(',')[1];
+          socket.emit('file_chunk', {
+            fileId: fileId,
+            chunkIndex: i,
+            totalChunks: totalChunks,
+            chunkData: base64Content,
+            fileName: file.name,
+            language,
+            currency
+          });
+        };
+        reader.readAsDataURL(blob);
+      }
       socket.emit('generate_pdfs', formData);
     });
 

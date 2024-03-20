@@ -3,6 +3,7 @@ from flask_socketio import SocketIO, emit
 from flask_cors import CORS
 import threading
 import os
+import base64
 
 app = Flask(__name__)
 CORS(app, origins=["http://localhost:3000"])
@@ -52,6 +53,44 @@ ALLOWED_EXTENSIONS = {'txt', 'pdf', 'zip', 'csv'}
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+file_chunks = {}
+
+@socketio.on("file_chunk")
+def handle_file_chunk(data):
+    print(f"\n\nLanguage: {data['language']} Currency: {data['currency']}\n\n")
+    # Extracting the chunk data
+    file_id = data["fileId"]
+    chunk_index = data["chunkIndex"]
+    total_chunks = data["totalChunks"]
+    chunk_data = base64.b64decode(data["chunkData"])
+    file_name = data["fileName"]  # Consider sanitizing this
+
+    # Initialize the file's chunk list if not already
+    if file_id not in file_chunks:
+        file_chunks[file_id] = [None] * total_chunks
+
+    # Store the chunk data
+    file_chunks[file_id][chunk_index] = chunk_data
+
+    # Check if all chunks have been received
+    if all(chunk is not None for chunk in file_chunks[file_id]):
+        upload_path = "uploads"
+        if not os.path.exists(upload_path):
+            os.makedirs(upload_path)
+
+        # Sanitize the file_name or ensure it's safe before appending it to the path
+        safe_file_name = os.path.join(upload_path, os.path.basename(file_name))
+
+        # Reassemble the file
+        with open(safe_file_name, "wb") as file:
+            for chunk in file_chunks[file_id]:
+                file.write(chunk)
+
+        print(f"Received and reassembled {safe_file_name}")
+
+        # Cleanup: remove stored chunks to free memory
+        del file_chunks[file_id]
 
 @socketio.on('send_file')
 def handle_file_send(data):
