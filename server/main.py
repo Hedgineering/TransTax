@@ -1,8 +1,8 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from flask_socketio import SocketIO, emit
 from flask_cors import CORS
 import threading
-import time
+import os
 
 app = Flask(__name__)
 CORS(app, origins=["http://localhost:3000"])
@@ -47,6 +47,27 @@ elif async_mode == "gevent":
 
 connected_users = {}
 
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'zip', 'csv'}
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@socketio.on('send_file')
+def handle_file_send(data):
+    print(data)
+    file_data = data['file_data']  # Assuming base64 encoded or byte array
+    filename = data['filename']
+    if allowed_file(filename):
+        try:
+            os.makedirs(app.config['UPLOAD_FOLDER'],exist_ok=True)
+            with open(os.path.join(app.config['UPLOAD_FOLDER'],filename), 'wb') as f:
+                f.write(file_data)
+            emit('file_received', {'filename': filename, 'message': 'File uploaded successfully!'})
+        except Exception as e:
+            emit('file_error', {'error': str(e)})
+    else:
+        emit('file_error', {'error': 'Invalid file type'})
 
 @socketio.on("connect")
 def handle_connect():
@@ -62,7 +83,6 @@ def handle_disconnect():
     if request.sid in connected_users:
         del connected_users[request.sid]
     print(f"Clients: {connected_users}")
-
 
 def handle_pdf_generation(request_sid):
     # Simulate busy work and generate placeholder PDF URLs
@@ -95,4 +115,5 @@ def handle_generate_pdfs(data):
 
 
 if __name__ == "__main__":
+    app.config['UPLOAD_FOLDER'] = 'uploads'
     socketio.run(app, debug=True)

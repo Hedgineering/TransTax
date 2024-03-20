@@ -28,7 +28,17 @@ const Home: React.FC = () => {
 
     socket.on('connect', () => {
       console.log('Connected to the server');
-      console.log(`form data: ${formData}`)
+      console.log(`form data: ${formData}`);
+      const reader = new FileReader();
+            reader.onload = () => {
+                const fileData = reader.result as ArrayBuffer;
+                socket.emit('send_file', { filename: file.name, file_data: new Uint8Array(fileData) });
+                console.log(file.name);
+                console.log("sending information");
+                // socket.emit('file_upload', { file, file_data: new Uint8Array(fileData) });
+                // console.log('File uploaded:', file);
+            };
+            reader.readAsArrayBuffer(file);
       socket.emit('generate_pdfs', formData);
     });
 
@@ -37,6 +47,10 @@ const Home: React.FC = () => {
     socket.on('pdf_ready', (data: { url: string }) => {
       console.log(`PDF ready: ${data.url}`);
       // Handle PDF URL (e.g., display it to the user)
+    });
+
+    socket.on('file_received', () => {
+      console.log("Finished receiving file");
     });
 
     socket.on('job_finished', (data) => {
