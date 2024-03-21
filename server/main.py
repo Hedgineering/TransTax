@@ -1,14 +1,3 @@
-from flask import Flask, request, jsonify, send_file
-from flask_socketio import SocketIO, emit
-from flask_cors import CORS
-import threading
-import os
-import base64
-
-app = Flask(__name__)
-CORS(app, origins=["http://localhost:3000"])
-socketio = SocketIO(app, cors_allowed_origins="*")
-
 # Set this variable to "threading", "eventlet" or "gevent" to test the
 # different async modes, or leave it set to None for the application to choose
 # the best option based on available packages. see https://stackoverflow.com/a/34598238
@@ -46,6 +35,17 @@ elif async_mode == "gevent":
 
     monkey.patch_all()
 
+from flask import Flask, request, jsonify, send_file
+from flask_socketio import SocketIO, emit
+from flask_cors import CORS
+import threading
+import os
+import base64
+
+app = Flask(__name__)
+CORS(app, origins=["http://localhost:3000"])
+socketio = SocketIO(app, cors_allowed_origins="*")
+
 connected_users = {}
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'zip', 'csv'}
@@ -58,7 +58,6 @@ file_chunks = {}
 
 @socketio.on("file_chunk")
 def handle_file_chunk(data):
-    print(f"\n\nLanguage: {data['language']} Currency: {data['currency']}\n\n")
     # Extracting the chunk data
     file_id = data["fileId"]
     chunk_index = data["chunkIndex"]
@@ -146,6 +145,14 @@ def handle_pdf_generation(request_sid):
 
 @socketio.on("generate_pdfs")
 def handle_generate_pdfs(data):
+    print("\n\n======================================================")
+    print(f"Source Language: {data['sourceLanguage']},")
+    print(f"Source Currency: {data['sourceCurrency']},")
+    print(f"Destination Language: {data['destinationLanguage']},")
+    print(f"Destination Currency: {data['destinationCurrency']}")
+    print(f"File Name: {data['fileName']}")
+    print(f"File ID: {data['fileId']}")
+    print("======================================================\n\n")
     print("Received request to generate PDFs:", data)
     # Start the PDF generation process in a separate thread to avoid blocking
     # Pass the client's session ID to target messages to the right client

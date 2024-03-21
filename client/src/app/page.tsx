@@ -1,13 +1,12 @@
 "use client";
 import React from 'react';
-import Translate from "./translate";
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import Translate from "./translate/page";
 
 const LandingPage: React.FC = () => {
   return (
     <div className="h-screen flex flex-col justify-center items-center">
       <header className="text-8xl font-serif font-bold mb-1">Transtax</header>
-      <p className="text-xl mb-4">Your tax translation tool</p>
+      <p className="text-xl mb-4">A Multilingual Invoice Generation Tool</p>
       <section className="w-1/2 bg-green-200 text-black p-8 rounded-lg shadow-md">
         <p className="text-lg mb-4">
           Transtax Multilingual & Currency Software is an innovative solution
@@ -27,14 +26,7 @@ const LandingPage: React.FC = () => {
         </p>
       </section>
       <div className="mt-4">
-        <Router>
-          <Routes>
-            <Route path="/Translate" element={<Translate />} />
-          </Routes>
-          <Link to="/Translate">
-            <button className="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2">Translate</button>
-          </Link>
-        </Router>
+        <a href='/translate' className="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2">Translate</a>
       </div>
     </div>
   );
