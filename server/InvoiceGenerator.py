@@ -481,7 +481,7 @@ def _create_pdf(
         PDF.dumps(pdf_file_handle, pdf)
 
 
-def generate_invoice(**kwargs):
+def generate_invoice(**kwargs) -> list[str]:
     global FONT
 
     if "filePath" in kwargs:
@@ -541,8 +541,6 @@ def generate_invoice(**kwargs):
 
         try:
             group = group.reset_index()
-            _create_pdf(group, i)
-            print(f"Invoice {i + 1} created")
             if group.loc[0]["Language"] != "en":
                 _create_pdf(group, i, language=group.loc[0]["Language"])
                 print(f"Invoice {i + 1} created in {group.loc[0]['Language']}")
@@ -550,6 +548,9 @@ def generate_invoice(**kwargs):
             print(f"Invoice {i + 1} failed!\n{e}\n")
 
     print("Done!")
+
+    return df["InvoiceNumber"].toList()
+
 
 
 if __name__ == "__main__":
