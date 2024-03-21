@@ -477,7 +477,7 @@ def _create_pdf(
     safe_file_name = os.path.join(generation_path, os.path.basename(base_filename))
 
     # write pdf
-    with open( safe_file_name, "wb") as pdf_file_handle:
+    with open(safe_file_name, "wb") as pdf_file_handle:
         PDF.dumps(pdf_file_handle, pdf)
 
 
@@ -512,17 +512,37 @@ def generate_invoice(**kwargs) -> list[str]:
             "japanese": "jp",
         }
         fonts = {
-            "english": Path(__file__).parent
-            / "fontpackage\\Noto_Sans\\NotoSans-VariableFont_wdth,wght.ttf",
-            "arabic": Path(__file__).parent
-            / "fontpackage\\Noto_Nastaliq_Urdu\\NotoNastaliqUrdu-VariableFont_wght.ttf",
-            "japanese": Path(__file__).parent
-            / "fontpackage\\Noto_Sans_JP\\NotoSansJP-VariableFont_wght.ttf",
+            "english": os.path.abspath(
+                os.path.join(
+                    os.path.dirname(__file__),
+                    "fontpackage",
+                    "Noto_Sans",
+                    "NotoSans-VariableFont_wdth,wght.ttf",
+                )
+            ),
+            "arabic": os.path.abspath(
+                os.path.join(
+                    os.path.dirname(__file__),
+                    "fontpackage",
+                    "Noto_Nastaliq_Urdu",
+                    "NotoNastaliqUrdu-VariableFont_wght.ttf",
+                )
+            ),
+            "japanese": os.path.abspath(
+                os.path.join(
+                    os.path.dirname(__file__),
+                    "fontpackage",
+                    "Noto_Sans_JP",
+                    "NotoSansJP-VariableFont_wght.ttf",
+                )
+            ),
         }
 
         df["Language"] = languages[kwargs["language"]]
         fontPath = fonts[kwargs["language"]]
-        FONT = TrueTypeFont.true_type_font_from_file(fontPath)
+        with open(fontPath, "rb") as fontFile:
+            fontData = fontFile.read()  # Read the entire file into a bytes object
+            FONT = TrueTypeFont.true_type_font_from_file(fontData)
 
     except KeyError as e:
         print(f"Error renaming columns: {e}")
@@ -549,8 +569,7 @@ def generate_invoice(**kwargs) -> list[str]:
 
     print("Done!")
 
-    return df["InvoiceNumber"].toList()
-
+    return df["InvoiceNumber"].to_list()
 
 
 if __name__ == "__main__":

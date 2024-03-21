@@ -43,6 +43,7 @@ from flask_cors import CORS
 import threading
 import os
 import base64
+import time
 
 app = Flask(__name__)
 CORS(app, origins=["http://localhost:3000"])
@@ -50,6 +51,7 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 
 connected_users = {}
 upload_path = "uploads"
+
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'zip', 'csv'}
 
@@ -132,6 +134,24 @@ def handle_pdf_generation(request_sid, data):
 
     # Sanitize the file_name or ensure it's safe before appending it to the path
     safe_file_name = os.path.join(upload_path, os.path.basename(file_name))
+
+    if not os.path.exists(upload_path):
+        print('upload path does not exist')
+        return
+
+    # Wait for the file to exist, with a timeout
+    start_time = time.time()
+    while not os.path.exists(safe_file_name):
+        if time.time() - start_time > 5:  # Timeout after 5 seconds
+            print('Timeout waiting for file to become available.')
+            return
+        time.sleep(0.1)  # Sleep for 100ms before checking again
+
+    # At this point, safe_file_name exists or we've timed out
+    if not os.path.isfile(safe_file_name):
+        print('safe file name path exists but is not a file')
+        return
+
     generate_invoice(filePath=safe_file_name, fileHeader=0, language=destination_language)
 
     socketio.emit("pdf_ready", {"urls": ["download1", "download2"]}, to=request_sid)
