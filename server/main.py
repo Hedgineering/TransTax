@@ -3,6 +3,8 @@
 # the best option based on available packages. see https://stackoverflow.com/a/34598238
 async_mode = None
 
+from InvoiceGenerator import generate_invoice
+
 if async_mode is None:
     try:
         import eventlet
@@ -122,7 +124,8 @@ def handle_disconnect():
         del connected_users[request.sid]
     print(f"Clients: {connected_users}")
 
-def handle_pdf_generation(request_sid):
+def handle_pdf_generation(request_sid, fileName):
+    print(fileName)
     # Simulate busy work and generate placeholder PDF URLs
     placeholder_urls = [
         "http://example.com/pdf1.pdf",
@@ -156,7 +159,7 @@ def handle_generate_pdfs(data):
     print("Received request to generate PDFs:", data)
     # Start the PDF generation process in a separate thread to avoid blocking
     # Pass the client's session ID to target messages to the right client
-    threading.Thread(target=handle_pdf_generation, args=(request.sid,)).start()
+    threading.Thread(target=handle_pdf_generation, args=(request.sid, data['fileName'])).start()
     # handle_pdf_generation(request.sid)
 
 
