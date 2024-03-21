@@ -3,6 +3,8 @@
 # the best option based on available packages. see https://stackoverflow.com/a/34598238
 async_mode = None
 
+from InvoiceGenerator import generate_invoice
+
 if async_mode is None:
     try:
         import eventlet
@@ -47,6 +49,7 @@ CORS(app, origins=["http://localhost:3000"])
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 connected_users = {}
+upload_path = "uploads"
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'zip', 'csv'}
 
@@ -74,7 +77,6 @@ def handle_file_chunk(data):
 
     # Check if all chunks have been received
     if all(chunk is not None for chunk in file_chunks[file_id]):
-        upload_path = "uploads"
         if not os.path.exists(upload_path):
             os.makedirs(upload_path)
 
@@ -122,21 +124,17 @@ def handle_disconnect():
         del connected_users[request.sid]
     print(f"Clients: {connected_users}")
 
-def handle_pdf_generation(request_sid):
-    # Simulate busy work and generate placeholder PDF URLs
-    placeholder_urls = [
-        "http://example.com/pdf1.pdf",
-        "http://example.com/pdf2.pdf",
-        "http://example.com/pdf3.pdf",
-    ]
+def handle_pdf_generation(request_sid, data):
+    file_name = data['fileName']
+    destination_language = data['destinationLanguage']
 
-    for idx, url in enumerate(placeholder_urls):
-        # Using time.sleep or thread.sleep screws up socketio async event loop, use socketio.sleep() instead
-        socketio.sleep(2)  # Simulate time taken to generate each PDF
-        # Emit 'pdf_ready' event with URL, only to the client that made the request
-        # socketio.emit("pdf_ready", {"url": url}, to=request_sid)
-        socketio.emit("pdf_ready", {"url": url}, to=request_sid)
-        print(f"sent pdf {idx+1} to client {request_sid}")
+    print(f"\n\nHandle pdf generation for {file_name}\n\n")
+
+    # Sanitize the file_name or ensure it's safe before appending it to the path
+    safe_file_name = os.path.join(upload_path, os.path.basename(file_name))
+    generate_invoice(filePath=safe_file_name, fileHeader=0, language=destination_language)
+
+    socketio.emit("pdf_ready", {"urls": ["download1", "download2"]}, to=request_sid)
 
     # After all PDFs are "generated", notify the client that the job is finished
     socketio.emit("job_finished", {"message": "All PDFs generated."}, to=request_sid)
@@ -156,7 +154,7 @@ def handle_generate_pdfs(data):
     print("Received request to generate PDFs:", data)
     # Start the PDF generation process in a separate thread to avoid blocking
     # Pass the client's session ID to target messages to the right client
-    threading.Thread(target=handle_pdf_generation, args=(request.sid,)).start()
+    threading.Thread(target=handle_pdf_generation, args=(request.sid, data)).start()
     # handle_pdf_generation(request.sid)
 
 
