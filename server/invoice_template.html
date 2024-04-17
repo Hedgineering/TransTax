@@ -1,0 +1,254 @@
+<!-- Support for Multiple Languages -->
+<head>
+    <style>
+        body {
+            font-size: 16px;
+            font-family: "Noto Sans", "Noto Sans Arabic", "Noto Sans Bengali", "Noto Sans Devanagari", "Noto Sans Hebrew", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC", "Noto Sans TC";
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: "Noto Sans", "Noto Sans Arabic", "Noto Sans Bengali", "Noto Sans Devanagari", "Noto Sans Hebrew", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC", "Noto Sans TC";
+        }
+
+        table tr td {
+            padding: 0;
+            font-family: "Noto Sans", "Noto Sans Arabic", "Noto Sans Bengali", "Noto Sans Devanagari", "Noto Sans Hebrew", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC", "Noto Sans TC";
+        }
+
+        table tr td:last-child {
+            text-align: right;
+            font-family: "Noto Sans", "Noto Sans Arabic", "Noto Sans Bengali", "Noto Sans Devanagari", "Noto Sans Hebrew", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC", "Noto Sans TC"; 
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        .right {
+            text-align: right;
+        }
+
+        .large {
+            font-size: 1.75em;
+        }
+
+        .total {
+            font-weight: bold;
+            color: #fb7578;
+        }
+
+        .logo-container {
+            margin: 20px 0 70px 0;
+        }
+
+        .invoice-info-container {
+            font-size: 0.875em;
+        }
+
+        .invoice-info-container td {
+            padding: 4px 0;
+        }
+
+        .client-name {
+            font-size: 1.5em;
+            vertical-align: top;
+        }
+
+        .line-items-container {
+            margin: 70px 0;
+            font-size: 0.875em;
+        }
+
+        .line-items-container th {
+            text-align: left;
+            color: #999;
+            border-bottom: 2px solid #ddd;
+            padding: 10px 0 15px 0;
+            font-size: 0.75em;
+            text-transform: uppercase;
+        }
+
+        .line-items-container th:last-child {
+            text-align: right;
+        }
+
+        .line-items-container td {
+            padding: 15px 0;
+        }
+
+        .line-items-container tbody tr:first-child td {
+            padding-top: 25px;
+        }
+
+        .line-items-container.has-bottom-border tbody tr:last-child td {
+            padding-bottom: 25px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .line-items-container.has-bottom-border {
+            margin-bottom: 0;
+        }
+
+        .line-items-container th.heading-quantity {
+            width: 50px;
+        }
+
+        .line-items-container th.heading-price {
+            text-align: right;
+            width: 100px;
+        }
+
+        .line-items-container th.heading-tax {
+            text-align: right;
+            width: 100px;
+        }
+
+
+        .line-items-container th.heading-subtotal {
+            width: 100px;
+        }
+
+        .payment-info {
+            width: 38%;
+            font-size: 0.75em;
+            line-height: 1.5;
+        }
+
+        .footer {
+            margin-top: 100px;
+        }
+
+        .footer-info {
+            float: right;
+            margin-top: 5px;
+            font-size: 0.75em;
+            color: #ccc;
+        }
+
+        .footer-info span {
+            padding: 0 5px;
+            color: black;
+        }
+
+        .footer-info span:last-child {
+            padding-right: 0;
+        }
+
+        .page-container {
+            display: none;
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@100..900&family=Noto+Sans+Bengali:wght@100..900&family=Noto+Sans+Devanagari:wght@100..900&family=Noto+Sans+Hebrew:wght@100..900&family=Noto+Sans+JP:wght@100..900&family=Noto+Sans+KR:wght@100..900&family=Noto+Sans+SC:wght@100..900&family=Noto+Sans+TC:wght@100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+
+<!-- Page Number -->
+<div class="page-container">
+    Page
+    <span class="page">1</span>
+    of
+    <span class="pages">1</span>
+</div>
+
+<!-- Logo -->
+<div class="logo-container">
+    <img style="height: 36px" src="https://marvel-b1-cdn.bc0a.com/f00000000283630/samtec-marketing-cdn.azureedge.net/kineticimages/images/mackdaddy-familypages/ieee/ieee_mb_blue_3015.png"/>
+</div>
+
+<!-- Invoice Info -->
+<table class="invoice-info-container">
+    <tr>
+        <td rowspan="2" class="client-name">
+            {{ company_info["CompanyName"] }}
+        </td>
+        <!-- <td>
+            {{ company_info["CompanyName"] }}
+        </td> -->
+    </tr>
+    <tr>
+        <td>
+            {{ company_info["CompanyStreet"] }}
+        </td>
+    </tr>
+    <tr>
+        <td>
+            {{ form["InvoiceDate"] }} <strong>May 24th, 2024</strong>
+        </td>
+        <td>
+            {{ company_info["CompanyRegion"] }}
+        </td>
+    </tr>
+    <tr>
+        <td>
+            {{ form["InvoiceNumber"] }} <strong>{{ invoice_info["InvoiceNumber"] }}</strong>
+        </td>
+        <td>
+            {{ company_info["CompanyEmail"] }}
+        </td>
+    </tr>
+</table>
+
+<!-- invoice itemized list  -->
+<table class="line-items-container">
+    <thead>
+        <tr>
+            <th class="heading-quantity">{{ form["Quantity"] }}</th>
+            <th class="heading-description">{{ form["Description"] }}</th>
+            <th class="heading-price">{{ form["Price"] }}</th>
+            <th class="heading-tax">{{ form["TaxRate"] }}</th>
+            <th class="heading-subtotal">{{ form["Subtotal"] }}</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {% for product in product_info %}
+        <tr>
+            <td>{{ product["Quantity"] }}</td>
+            <td>{{ product["Product"] }}</td>
+            <td>{{ product["UnitPrice"] }}</td>
+            <td>{{ product["TaxRate"] }}</td>
+            <td>{{ (product["Quantity"] * product["UnitPrice"] * product["TaxRate"]) }}</td>
+        </tr>
+        {% endfor %}
+
+    </tbody>
+</table>
+
+<table class="line-items-container has-bottom-border">
+    <thead>
+        <tr>
+            <th>{{ form["PaymentInfo"] }}</th>
+            <th>{{ form["DueBy"] }}</th>
+            <th>{{ form["TotalDue"] }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="payment-info">
+                <div>
+                    {{ form["AccountNumber"] }} <strong>123567744</strong>
+                </div>
+                <div>
+                    {{ form["RoutingNumber"] }} <strong>120000547</strong>
+                </div>
+                <div>
+
+                </div>
+            </td>
+            <td class="large">May 30th, 2024</td>
+
+            <td class="large total">{{ total }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="footer">
+    <div class="footer-info">
+        <span>hello@useanvil.com</span> |
+        <span>555 444 6666</span> |
+        <span>useanvil.com</span>
+    </div>
+</div>
