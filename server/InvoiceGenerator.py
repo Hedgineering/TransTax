@@ -4,8 +4,8 @@ import argostranslate.translate
 import jinja2
 import numpy as np
 import pandas as pd
+from datetime import date, timedelta
 from weasyprint import HTML
-from datetime import date
 
 
 # translates text
@@ -26,6 +26,9 @@ def translate(text: str = "", src_language: str = "en", dest_language: str = "en
 
     # translate
     return argostranslate.translate.translate(text, src_language, dest_language)
+
+def translate_wrapper(text, src_language, dest_language):
+    return translate(text, src_language, dest_language)
 
 
 # read database
@@ -50,12 +53,15 @@ def interpolate(df: pd.DataFrame) -> pd.DataFrame:
 
     filled_df = df
 
+    if "DueDate" not in filled_df.columns:
+        filled_df["DueDate"] = filled_df["InvoiceDate"] + timedelta(days=30)
+
     # add missing columns
     fields = [
         "InvoiceDate",
         "InvoiceNumber",
         "DueDate",
-        "Company",
+        "CompanyName",
         "CompanyStreet",
         "CompanyRegion",
         "CompanyPhone",
@@ -103,8 +109,8 @@ def interpolate(df: pd.DataFrame) -> pd.DataFrame:
         value={
             "InvoiceDate": date.today(),
             "InvoiceNumber": -1,
-            "DueDate": date.today(),
-            "Company": "IEEE",
+            "DueDate": date.today() + timedelta(days=30),
+            "CompanyName": "IEEE",
             "CompanyStreet": "445 Hoes Lane",
             "CompanyRegion": "Piscataway, NJ 08854",
             "CompanyPhone": "+1 732 981 0060",
@@ -167,7 +173,7 @@ def create_pdf(
     logo: str = "https://1000logos.net/wp-content/uploads/2019/03/IEEE-Logo.jpg",
     src_language: str = "en",
     dest_language: str = "en"
-) -> int:
+) -> None:
 
     cwd: str = os.getcwd()
 
@@ -187,10 +193,10 @@ def create_pdf(
         "Quantity": translate("Quantity", "en", dest_language),
         "Description": translate("Description", "en", dest_language),
         "UnitPrice": translate("Unit Price", "en", dest_language),
-        "Tax Rate": translate("Tax Rate", "en", dest_language),
+        "TaxRate": translate("Tax Rate", "en", dest_language),
         "Subtotal": translate("Subtotal", "en", dest_language),
         "PaymentInfo": translate("Payment Information", "en", dest_language),
-        "DueBy": translate("Due By", "en", dest_language),
+        "DueDate": translate("Due Date", "en", dest_language),
         "TotalDue": translate("Total Due", "en", dest_language),
         "AccountNumber": translate("Account Number", "en", dest_language),
         "RoutingNumber": translate("Routing Number", "en", dest_language),
@@ -201,6 +207,7 @@ def create_pdf(
         "DueDate": row1["DueDate"]
     }
     company_info = {
+        "CompanyName": translate(row1["CompanyName"], src_language, dest_language),
         "CompanyStreet": translate(row1["CompanyStreet"], src_language, dest_language),
         "CompanyRegion": translate(row1["CompanyRegion"], src_language, dest_language),
         "CompanyPhone": row1["CompanyPhone"],
@@ -223,6 +230,59 @@ def create_pdf(
         "ShipToZip": row1["ShipToZip"],
         "ShipToPhone": row1["ShipToPhone"]
     }
+
+    # form = {
+    #     "InvoiceDate": "Invoice Date:",
+    #     "InvoiceNumber": "Invoice Number:",
+    #     "Quantity": "Quantity", 
+    #     "Description": "Description",
+    #     "UnitPrice": "Unit Price",
+    #     "TaxRate": "Tax Rate",
+    #     "Subtotal": "Subtotal",
+    #     "PaymentInfo": "Payment Information",
+    #     "DueDate": "Due Date",
+    #     "TotalDue": "Total Due",
+    #     "AccountNumber": "Account Number",
+    #     "RoutingNumber": "Routing Number"
+    # }
+    # invoice_info = {
+    #     "InvoiceDate": row1["InvoiceDate"],
+    #     "InvoiceNumber": row1["InvoiceNumber"],
+    #     "DueDate": row1["DueDate"]
+    # }
+    # company_info = {
+    #     "CompanyName": row1["CompanyName"],
+    #     "CompanyStreet": row1["CompanyStreet"],
+    #     "CompanyRegion": row1["CompanyRegion"], 
+    #     "CompanyPhone": row1["CompanyPhone"],
+    #     "CompanyEmail": row1["CompanyEmail"],
+    #     "CompanyWebsite": row1["CompanyWebsite"]
+    # }
+    # billing_info = {
+    #     "BillToName": row1["BillToName"],
+    #     "BillToStreet": row1["BillToStreet"],
+    #     "BillToCity": row1["BillToCity"],
+    #     "BillToRegion": row1["BillToRegion"],
+    #     "BillToZip": row1["BillToZip"],
+    #     "BillToPhone": row1["BillToPhone"]
+    # }
+    # shipping_info = {
+    #     "ShipToName": row1["ShipToName"],
+    #     "ShipToStreet": row1["ShipToStreet"], 
+    #     "ShipToCity": row1["ShipToCity"],
+    #     "ShipToRegion": row1["ShipToRegion"],
+    #     "ShipToZip": row1["ShipToZip"],
+    #     "ShipToPhone": row1["ShipToPhone"]
+    # }
+    # from multiprocessing import Pool
+    # with Pool() as pool:
+    #     row1 = df.loc[0]
+    #     form = {k: pool.apply(translate_wrapper, args=(v, "en", dest_language)) for k, v in form.items()}
+    #     company_info = {k: pool.apply(translate_wrapper, args=(v, src_language, dest_language)) if isinstance(v, str) else v for k, v in company_info.items()}
+    #     billing_info = {k: pool.apply(translate_wrapper, args=(v, src_language, dest_language)) if isinstance(v, str) else v for k, v in billing_info.items()}
+    #     shipping_info = {k: pool.apply(translate_wrapper, args=(v, src_language, dest_language)) if isinstance(v, str) else v for k, v in shipping_info.items()}
+
+
     product_info = df.to_dict(orient="records")
 
     template_loader = jinja2.FileSystemLoader("./")
@@ -242,7 +302,6 @@ def create_pdf(
 
     with open(safe_filename, "wb") as pdf_file:
         HTML(string=html_output, base_url="https://fonts.googleapis.com").write_pdf(pdf_file)
-
 
 
 def generate_invoice(**kwargs) -> list[str]:
@@ -288,7 +347,13 @@ def generate_invoice(**kwargs) -> list[str]:
     grouped = df.groupby("InvoiceNumber", as_index=False)
 
     # generate unique invoice for each group
-    print("\nCreating invoices...\n\n\n")
+    print("\nCreating invoices...\n")
+
+    # with multiprocessing.Pool(processes=4) as pool:
+    #     data = [(group, i, src_language, dest_language) for i, (_, group) in enumerate(grouped)]
+    #     pool.starmap(create_pdf_wrapper, data)
+    # print("Done!")
+
     for i, (_, group) in enumerate(grouped):
         try:
             group = group.reset_index()

@@ -5,62 +5,49 @@
             font-size: 16px;
             font-family: "Noto Sans", "Noto Sans Arabic", "Noto Sans Bengali", "Noto Sans Devanagari", "Noto Sans Hebrew", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC", "Noto Sans TC";
         }
-
         table {
             width: 100%;
             border-collapse: collapse;
             font-family: "Noto Sans", "Noto Sans Arabic", "Noto Sans Bengali", "Noto Sans Devanagari", "Noto Sans Hebrew", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC", "Noto Sans TC";
         }
-
         table tr td {
             padding: 0;
             font-family: "Noto Sans", "Noto Sans Arabic", "Noto Sans Bengali", "Noto Sans Devanagari", "Noto Sans Hebrew", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC", "Noto Sans TC";
         }
-
         table tr td:last-child {
             text-align: right;
             font-family: "Noto Sans", "Noto Sans Arabic", "Noto Sans Bengali", "Noto Sans Devanagari", "Noto Sans Hebrew", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC", "Noto Sans TC"; 
         }
-
         .bold {
             font-weight: bold;
         }
-
         .right {
             text-align: right;
         }
-
         .large {
             font-size: 1.75em;
         }
-
         .total {
             font-weight: bold;
             color: #fb7578;
         }
-
         .logo-container {
             margin: 20px 0 70px 0;
         }
-
         .invoice-info-container {
             font-size: 0.875em;
         }
-
         .invoice-info-container td {
             padding: 4px 0;
         }
-
         .client-name {
             font-size: 1.5em;
             vertical-align: top;
         }
-
         .line-items-container {
             margin: 70px 0;
             font-size: 0.875em;
         }
-
         .line-items-container th {
             text-align: left;
             color: #999;
@@ -69,28 +56,22 @@
             font-size: 0.75em;
             text-transform: uppercase;
         }
-
         .line-items-container th:last-child {
             text-align: right;
         }
-
         .line-items-container td {
             padding: 15px 0;
         }
-
         .line-items-container tbody tr:first-child td {
             padding-top: 25px;
         }
-
         .line-items-container.has-bottom-border tbody tr:last-child td {
             padding-bottom: 25px;
             border-bottom: 2px solid #ddd;
         }
-
         .line-items-container.has-bottom-border {
             margin-bottom: 0;
         }
-
         .line-items-container th.heading-quantity {
             width: 50px;
         }
@@ -99,43 +80,34 @@
             text-align: right;
             width: 100px;
         }
-
         .line-items-container th.heading-tax {
             text-align: right;
             width: 100px;
         }
-
-
         .line-items-container th.heading-subtotal {
             width: 100px;
         }
-
         .payment-info {
             width: 38%;
             font-size: 0.75em;
             line-height: 1.5;
         }
-
         .footer {
             margin-top: 100px;
         }
-
         .footer-info {
             float: right;
             margin-top: 5px;
             font-size: 0.75em;
             color: #ccc;
         }
-
         .footer-info span {
             padding: 0 5px;
             color: black;
         }
-
         .footer-info span:last-child {
             padding-right: 0;
         }
-
         .page-container {
             display: none;
         }
@@ -155,7 +127,7 @@
 
 <!-- Logo -->
 <div class="logo-container">
-    <img style="height: 36px" src="https://marvel-b1-cdn.bc0a.com/f00000000283630/samtec-marketing-cdn.azureedge.net/kineticimages/images/mackdaddy-familypages/ieee/ieee_mb_blue_3015.png"/>
+    <img style="height: 54px" src="https://marvel-b1-cdn.bc0a.com/f00000000283630/samtec-marketing-cdn.azureedge.net/kineticimages/images/mackdaddy-familypages/ieee/ieee_mb_blue_3015.png"/>
 </div>
 
 <!-- Invoice Info -->
@@ -164,9 +136,9 @@
         <td rowspan="2" class="client-name">
             {{ company_info["CompanyName"] }}
         </td>
-        <!-- <td>
+        <td>
             {{ company_info["CompanyName"] }}
-        </td> -->
+        </td>
     </tr>
     <tr>
         <td>
@@ -175,7 +147,7 @@
     </tr>
     <tr>
         <td>
-            {{ form["InvoiceDate"] }} <strong>May 24th, 2024</strong>
+            {{ form["InvoiceDate"] }} <strong>{{ invoice_info["InvoiceDate"].strftime("%Y-%m-%d") }}</strong>
         </td>
         <td>
             {{ company_info["CompanyRegion"] }}
@@ -197,7 +169,7 @@
         <tr>
             <th class="heading-quantity">{{ form["Quantity"] }}</th>
             <th class="heading-description">{{ form["Description"] }}</th>
-            <th class="heading-price">{{ form["Price"] }}</th>
+            <th class="heading-price">{{ form["UnitPrice"] }}</th>
             <th class="heading-tax">{{ form["TaxRate"] }}</th>
             <th class="heading-subtotal">{{ form["Subtotal"] }}</th>
         </tr>
@@ -208,9 +180,9 @@
         <tr>
             <td>{{ product["Quantity"] }}</td>
             <td>{{ product["Product"] }}</td>
-            <td>{{ product["UnitPrice"] }}</td>
-            <td>{{ product["TaxRate"] }}</td>
-            <td>{{ (product["Quantity"] * product["UnitPrice"] * product["TaxRate"]) }}</td>
+            <td>{{ "$%0.2f" | format(product["UnitPrice"] | float) }}</td>
+            <td>{{ "%0.2f" | format(product["TaxRate"]*100 | float) }}%</td>
+            <td>{{ "$%0.2f" | format(product["Quantity"] * product["UnitPrice"] * product["TaxRate"] | float) }}</td>
         </tr>
         {% endfor %}
 
@@ -221,7 +193,7 @@
     <thead>
         <tr>
             <th>{{ form["PaymentInfo"] }}</th>
-            <th>{{ form["DueBy"] }}</th>
+            <th>{{ form["DueDate"] }}</th>
             <th>{{ form["TotalDue"] }}</th>
         </tr>
     </thead>
@@ -238,9 +210,9 @@
 
                 </div>
             </td>
-            <td class="large">May 30th, 2024</td>
+            <td class="large">{{ invoice_info["DueDate"].strftime("%Y-%m-%d") }}</td>
 
-            <td class="large total">{{ total }}</td>
+            <td class="large total">{{ "$%0.2f" | format(total | float) }}</td>
         </tr>
     </tbody>
 </table>
