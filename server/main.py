@@ -128,7 +128,15 @@ def handle_disconnect():
 
 def handle_pdf_generation(request_sid, data):
     file_name = data['fileName']
-    destination_language = data['destinationLanguage']
+
+    languages = {
+        "arabic": "ar",
+        "english": "en",
+        "japanese": "ja",
+    }
+
+    source_language = languages[data['sourceLanguage']]
+    destination_language = languages[data['destinationLanguage']]
 
     print(f"\n\nHandle pdf generation for {file_name}\n\n")
 
