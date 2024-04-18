@@ -152,7 +152,7 @@ def handle_pdf_generation(request_sid, data):
         print('safe file name path exists but is not a file')
         return
 
-    generate_invoice(filePath=safe_file_name, fileHeader=0, language=destination_language)
+    generate_invoice(filePath=safe_file_name, fileHeader=0, dest_language=destination_language)
 
     socketio.emit("pdf_ready", {"urls": ["download1", "download2"]}, to=request_sid)
 
