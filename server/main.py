@@ -131,12 +131,21 @@ def handle_pdf_generation(request_sid, data):
 
     languages = {
         "arabic": "ar",
+        "chinese": "zh",
         "english": "en",
+        "french": "fr",
+        "greek": "el",
+        "hindi": "hi",
         "japanese": "ja",
+        "korean": "ko",
+        "russian": "ru",
+        "spanish": "es",
     }
 
-    source_language = languages[data['sourceLanguage']]
-    destination_language = languages[data['destinationLanguage']]
+    source_language = languages[data["sourceLanguage"]]
+    destination_language = languages[data["destinationLanguage"]]
+
+    
 
     print(f"\n\nHandle pdf generation for {file_name}\n\n")
 
