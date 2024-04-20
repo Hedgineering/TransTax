@@ -92,8 +92,15 @@ const Translate: React.FC = () => {
             >
               <option value="">Select Language</option>
               <option value="arabic">Arabic</option>
+              <option value="chinese">Chinese</option>
               <option value="english">English</option>
+              <option value="french">French</option>
+              <option value="greek">Greek</option>
+              <option value="hindi">Hindi</option>
               <option value="japanese">Japanese</option>
+              <option value="korean">Korean</option>
+              <option value="russian">Russian</option>
+              <option value="spanish">Spanish</option>
             </select>
           </div>
           <div>
@@ -121,8 +128,15 @@ const Translate: React.FC = () => {
             >
               <option value="">Select Language</option>
               <option value="arabic">Arabic</option>
+              <option value="chinese">Chinese</option>
               <option value="english">English</option>
+              <option value="french">French</option>
+              <option value="greek">Greek</option>
+              <option value="hindi">Hindi</option>
               <option value="japanese">Japanese</option>
+              <option value="korean">Korean</option>
+              <option value="russian">Russian</option>
+              <option value="spanish">Spanish</option>
             </select>
           </div>
           <div>
