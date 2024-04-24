@@ -1,0 +1,34 @@
+#InvoiceDate,InvoiceNumber,ShipToAddress,ShipToCity,ShipToZip,ShipToCountry,Product,GrossAmount,TaxCollected,ExemptAmount,TransactionType,BillToAddress,BillToState,BillToZip,Debit_CreditIndicator,BILL TO COUNTRY
+11/15/2023,C600473724,2209,Abu Dhabi,2235,AE,DAT-NON-1,2070,103.5,0,1,2209,Abu Dhabi,2235,1,AE
+11/11/2023,C600472548,242,Dubai,1118,AE,DAT-NON-1,1850,92.5,0,1,242,N/A,1118,1,AE
+11/16/2023,C600474302,"Al reem island, Leaf tower, Level 21 Unit 2107",Abu Dhabi,2759,AE,DAT-NON-1,1462.5,73.13,0,1,"Al reem island, Leaf tower, Level 21 Unit 2107",N/A,2759,1,AE
+11/6/2023,C600470793,American University of Sharjah,Sharjah,26666,AE,DAT-NON-1,1462.5,73.13,0,1,American University of Sharjah,N/A,26666,1,AE
+11/5/2023,C600470373,Department Of Computer Science and Engineering,Sharjah,POBOx26666,AE,PAG-NON-1,1950,97.5,0,1,Department Of Computer Science and Engineering,Sharjah,POBOx26666,1,AE
+11/15/2023,C600473878,Department of Electrical and Computer Engineering,Ajman,346,AE,PAG-NON-1,1950,97.5,0,1,Department of Electrical and Computer Engineering,N/A,346,1,AE
+11/14/2023,C600473313,Dubai International Academic City,Dubai,NA,AE,DAT-NON-1,500,25,0,1,Dubai International Academic City,N/A,NA,1,AE
+11/2/2023,C600469397,HCT Al Ain,Al Ain,00000,AE,DAT-NON-1,1462.5,73.13,0,1,HCT Al Ain,Abu Dhabi,00000,1,AE
+11/3/2023,C600470055,Khalifa University,Abu Dhabi,00000,AE,DAT-NON-1,972,48.6,0,1,Khalifa University,N/A,00000,1,AE
+11/14/2023,C600473184,Khalifa University,Abu Dhabi,00000,AE,DAT-NON-1,972,0,972,1,Khalifa University,N/A,00000,1,AE
+11/14/2023,C600473562,Khalifa University,Abu Dhabi,00000,AE,PAG-NON-1,972,48.6,0,1,Khalifa University,N/A,00000,2,AE
+11/12/2023,C600472591,Mohamed bin Zayed university of artificial intelligence,Abu Dhabi,26262,AE,DAT-NON-1,1225,61.25,0,1,Mohamed bin Zayed university of artificial intelligence,N/A,26262,2,AE
+11/13/2023,C600472818,Mohamed bin Zayed University of Artificial Intelligence,Abu Dhabi,108100,AE,DAT-NON-1,660,33,0,1,Mohamed bin Zayed University of Artificial Intelligence,N/A,108100,1,AE
+11/5/2023,C600470331,New York University,Athens,13676,AE,DAT-NON-1,350,17.5,0,1,New York University,N/A,13676,1,AE
+11/5/2023,C600470300,New York University Abu Dhabi,Abu Dhabi,129188,AE,DAT-NON-1,1950,0,1950,1,New York University Abu Dhabi,N/A,129188,1,AE
+11/7/2023,C600471184,New York University Abu Dhabi,Abu Dhabi,129188,AE,DAT-NON-1,1950,0,1950,1,New York University Abu Dhabi,N/A,129188,1,AE
+11/10/2023,C600472137,New York University Abu Dhabi,Abu Dhabi,129188,AE,PAG-NON-1,1560,0,1560,1,New York University Abu Dhabi,N/A,129188,1,AE
+11/10/2023,C600472153,New York University Abu Dhabi,Abu Dhabi,129188,AE,PAG-NON-1,1950,0,1950,1,New York University Abu Dhabi,N/A,129188,2,AE
+11/11/2023,C600472463,New York University Abu Dhabi,Abu Dhabi,129188,AE,DAT-NON-1,1540,0,1540,1,New York University Abu Dhabi,N/A,129188,1,AE
+11/13/2023,C600472775,"NEW YORK UNIVERSITY IN ABU DHABI, SAADIYAT CAMPUS",Abu Dhabi,00000,AE,DAT-NON-1,1760,0,1760,1,"NEW YORK UNIVERSITY IN ABU DHABI, SAADIYAT CAMPUS",Abu Dhabi,00000,1,AE
+11/8/2023,C600471341,Po Box 127788,Abu Dhabi,11111,AE,DAT-NON-1,175,8.75,0,1,Po Box 127788,ABU DHABI,11111,1,AE
+11/12/2023,C600472604,"Rabdan Academy, Dhafeer Street",Abu Dhabi,114646,AE,DAT-NON-1,1950,0,1950,1,"Rabdan Academy, Dhafeer Street",N/A,114646,1,AE
+11/3/2023,C600469909,Saadiyat Island,Abu Dhabi,129188,AE,DAT-NON-1,1950,97.5,0,1,Saadiyat Island,N/A,129188,2,AE
+11/5/2023,C600470284,Saadiyat Marina District - ABU DHABI,ABU DHABI,129188,AE,DAT-NON-1,1560,78,0,1,Saadiyat Marina District - ABU DHABI,N/A,129188,1,AE
+11/8/2023,C600471610,Saadiyat Marina District - ABU DHABI,ABU DHABI,129188,AE,DAT-NON-1,1560,78,0,1,Saadiyat Marina District - ABU DHABI,N/A,129188,2,AE
+11/8/2023,C600471658,SAN Ruwais Bldg.1F 3108A,Abu Dhabi,127788,AE,DAT-NON-1,360,18,0,1,SAN Ruwais Bldg.1F 3108A,Abu Dhabi,127788,2,AE
+11/9/2023,C600471852,SAN Ruwais Bldg.1F 3108A,Abu Dhabi,127788,AE,DAT-NON-1,360,0,360,1,SAN Ruwais Bldg.1F 3108A,Abu Dhabi,127788,1,AE
+11/10/2023,C600472146,"Springs 1, Street 4, Villa 1",Dubai,00000,AE,PAG-NON-1,1950,97.5,0,1,"Springs 1, Street 4, Villa 1",Dubai,00000,1,AE
+11/16/2023,C600474081,The Electrical and Computer Engineering (ECE) Department,Abu Dhabi,0000,AE,PAG-NON-1,220,0,220,1,The Electrical and Computer Engineering (ECE) Department,N/A,0000,1,AE
+11/16/2023,C600474138,The Electrical and Computer Engineering (ECE) Department,Abu Dhabi,000000,AE,DAT-NON-1,220,0,220,1,The Electrical and Computer Engineering (ECE) Department,N/A,000000,1,AE
+11/16/2023,C600474419,The Electrical and Computer Engineering (ECE) Department,Abu Dhabi,000000,AE,PAG-NON-1,220,0,220,1,The Electrical and Computer Engineering (ECE) Department,N/A,000000,1,AE
+11/5/2023,C600470292,"University of Sharjah, Medical Diagnostic Imaging",Sharjah,0000,AE,PAG-NON-1,1950,97.5,0,1,"University of Sharjah, Medical Diagnostic Imaging",N/A,0000,1,AE
+11/10/2023,C600472151,Villa number 325 Primrose Cluster,Dubai,835215,AE,DAT-NON-1,350,17.5,0,1,Villa number 325 Primrose Cluster,Dubai,835215,1,AE

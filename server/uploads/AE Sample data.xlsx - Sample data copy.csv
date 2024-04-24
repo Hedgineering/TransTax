@@ -1,0 +1,7 @@
+#InvoiceDate,InvoiceNumber,ShipToAddress,ShipToCity,ShipToZip,ShipToCountry,Product,GrossAmount,TaxCollected,ExemptAmount,TransactionType,BillToAddress,BillToState,BillToZip,Debit_CreditIndicator,BILL TO COUNTRY
+11/15/2023,C600473724,2209,Abu Dhabi,2235,AE,DAT-NON-1,2070,103.5,0,1,2209,Abu Dhabi,2235,1,AE
+11/15/2023,C600473724,2209,Abu Dhabi,2235,AE,Product 2,2030,103,0,1,2209,Abu Dhabi,2235,1,AE
+11/15/2023,C600473724,2209,Abu Dhabi,2235,AE,Product 3,170,5.5,0,1,2209,Abu Dhabi,2235,1,AE
+11/23/2023,C600473744,604 Bartholomew Rd,Piscataway,8854,US,Capstone Grade A,0.05,0.01,0,1,604 Bartholomew Rd,Piscataway,8854,1,US
+11/23/2023,C600473744,604 Bartholomew Rd,Piscataway,8854,US,Capstone Judge,2000,6,0,1,604 Bartholomew Rd,Piscataway,8854,1,US
+11/23/2023,C600473744,604 Bartholomew Rd,Piscataway,8854,US,Capstone Pizza,2000,6,0,1,604 Bartholomew Rd,Piscataway,8854,1,US

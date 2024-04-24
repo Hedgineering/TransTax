@@ -1,12 +1,25 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, ReactNode } from 'react';
 import io from 'socket.io-client';
+const Conditional = ({
+  showWhen,
+  children,
+}:{
+  showWhen: boolean;
+  children: ReactNode;
+}) => {
+  if(showWhen) return <>(children)</>;
+  return <></>;
+};
 
 const Translate: React.FC = () => {
   const [sourceLanguage, setSrcLanguage] = useState('');
   const [sourceCurrency, setSrcCurrency] = useState('');
   const [destinationLanguage, setDestLanguage] = useState('');
   const [destinationCurrency, setDestCurrency] = useState('');
+  const [downloadurls, setDownloadurls] = useState<string[]>([]);
+  const [buttonStates, setButtonStates] = useState(downloadurls.map(() => "Loading..."));
+  let showDownloadUrls = downloadurls.length > 0;
   const [file, setFile] = useState<File | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -66,6 +79,9 @@ const Translate: React.FC = () => {
     });
 
     socket.on('send_aws_urls', (data:{urls: [string] }) => {
+      setDownloadurls(data.urls);
+      console.log(downloadurls);
+      showDownloadUrls = true;
       data.urls.forEach((url) => console.log(`PDF URL is ${url}`));
     });
 
@@ -171,6 +187,24 @@ const Translate: React.FC = () => {
           </div>
           <button type="submit" className="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Submit</button>
         </form>
+        <div>
+          <h3 className='text-black'>Download URLS</h3>
+          <ul>
+              {downloadurls.map((url,index) => (
+                <div key={index} className="flex flex-row items-center space-x-2">
+                <p className='text-black'>PDF {index + 1}</p>
+                <button
+                  className='ml-4 text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2'
+                  onClick={() => window.location.href = url}
+                  // disabled={buttonStates[index] === "Loading..."}
+                  // className={`btn btn-blue ${buttonStates[index] === "Loading..." ? "opacity-50 cursor-not-allowed" : ""}`}
+                >
+                  {/* {buttonStates[index]} */}Download
+                </button>
+              </div>
+              ))}
+          </ul>
+        </div>
       </div>
       <div className="mt-4">
         <a href='/' className="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2">Home</a>
