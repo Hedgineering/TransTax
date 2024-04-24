@@ -4,7 +4,7 @@ import argostranslate.translate
 import jinja2
 import numpy as np
 import pandas as pd
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from weasyprint import HTML
 
 
@@ -37,10 +37,28 @@ def read_file(
 ) -> pd.DataFrame:
 
     extension = filePath.split(".")[-1].lower()
+    column_type = {
+    0: 'datetime64[ns]',  # Datetime
+    1: 'object',           # Object (string)
+    2: 'object',           # Object (string)
+    3: 'object',           # Object (string)
+    4: 'object',           # Object (string)
+    5: 'object',           # Object (string)
+    6: 'object',           # Object (string)
+    7: 'float64',          # Float
+    8: 'float64',          # Float
+    9: 'int64',            # Integer
+    10: 'int64',           # Integer
+    11: 'object',          # Object (string)
+    12: 'object',          # Object (string)
+    13: 'object',          # Object (string)
+    14: 'int64',           # Integer
+    15: 'object'           # Object (string)
+}
     if extension == "xlsx":
-        df = pd.read_excel(filePath, header=fileHeader)
+        df = pd.read_excel(filePath, header=fileHeader, dtype=column_type)
     elif extension == "csv":
-        df = pd.read_csv(filePath, header=fileHeader)
+        df = pd.read_csv(filePath, header=fileHeader, dtype=column_type)
     else:
         raise ValueError(
             f"Unsupported file format: {extension}\nSupported file formats: xlsx, csv"
@@ -363,7 +381,7 @@ def generate_invoice(**kwargs) -> list[str]:
             print(f"Invoice {i + 1}, # {group.loc[0]["InvoiceNumber"]}, failed!\n{e}\n")
     print("Done!")
 
-    return df["InvoiceNumber"].to_list()
+    return [f"Invoice_{i}_{src_language}_to_{dest_language}.pdf" for i in df["InvoiceNumber"].unique().tolist()]
 
 
 if __name__ == "__main__":
