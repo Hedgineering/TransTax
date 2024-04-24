@@ -5,37 +5,37 @@ async_mode = None
 
 from InvoiceGenerator import generate_invoice
 
-if async_mode is None:
-    try:
-        import eventlet
+# if async_mode is None:
+#     try:
+#         import eventlet
 
-        async_mode = "eventlet"
-    except ImportError:
-        pass
+#         async_mode = "eventlet"
+#     except ImportError:
+#         pass
 
-    if async_mode is None:
-        try:
-            from gevent import monkey
+#     if async_mode is None:
+#         try:
+#             from gevent import monkey
 
-            async_mode = "gevent"
-        except ImportError:
-            pass
+#             async_mode = "gevent"
+#         except ImportError:
+#             pass
 
-    if async_mode is None:
-        async_mode = "threading"
+#     if async_mode is None:
+#         async_mode = "threading"
 
-    print("async_mode is " + async_mode)
+#     print("async_mode is " + async_mode)
 
 # monkey patching is necessary because this application uses a background
 # thread
-if async_mode == "eventlet":
-    import eventlet
+# if async_mode == "eventlet":
+#     import eventlet
 
-    eventlet.monkey_patch()
-elif async_mode == "gevent":
-    from gevent import monkey
+#     eventlet.monkey_patch()
+# elif async_mode == "gevent":
+#     from gevent import monkey
 
-    monkey.patch_all()
+#     monkey.patch_all()
 
 from flask import Flask, request, jsonify, send_file
 from flask_socketio import SocketIO, emit, send
@@ -49,13 +49,13 @@ from botocore.exceptions import ClientError
 from dotenv import load_dotenv
 
 load_dotenv()
-# BUCKET_NAME = os.environ['BUCKET_NAME'] 
-# ACCESS_ID= os.environ['ACCESS_ID'] 
-# ACCESS_KEY = os.environ['ACCESS_KEY'] 
-# s3 = boto3.client('s3',
-#                     aws_access_key_id=ACCESS_ID,
-#                     aws_secret_access_key= ACCESS_KEY)
-# buckets_resp = s3.list_buckets()
+BUCKET_NAME = os.environ['BUCKET_NAME'] 
+ACCESS_ID= os.environ['ACCESS_ID'] 
+ACCESS_KEY = os.environ['ACCESS_KEY'] 
+s3 = boto3.client('s3',
+                    aws_access_key_id=ACCESS_ID,
+                    aws_secret_access_key= ACCESS_KEY)
+buckets_resp = s3.list_buckets()
 app = Flask(__name__)
 CORS(app, origins=["http://localhost:3000"])
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -235,11 +235,10 @@ def handle_pdf_generation(request_sid, data):
         return
 
     info = generate_invoice(filePath=safe_file_name, fileHeader=0, dest_language=destination_language)
-    
     socketio.emit("pdf_ready", {"urls": info}, to=request_sid)
 
     # After all PDFs are "generated", notify the client that the job is finished
-    socketio.emit("job_finished", {"message": "All PDFs generated."}, to=request_sid)
+    # socketio.emit("job_finished", {"message": "All PDFs generated."}, to=request_sid)
     print(f"finished sending pdfs to {request_sid}")
 
 
@@ -256,49 +255,34 @@ def handle_generate_pdfs(data):
     print("Received request to generate PDFs:", data)
     # Start the PDF generation process in a separate thread to avoid blocking
     # Pass the client's session ID to target messages to the right client
-    threading.Thread(target=handle_pdf_generation, args=(request.sid, data)).start()
+    # threading.Thread(target=handle_pdf_generation, args=(request.sid, data)).start()
+    handle_pdf_generation(request.sid,data)
     # handle_pdf_generation(request.sid)
 
 @socketio.on('send_urls')
 def send_url_links(data):
-    file_path = './generated/Invoice_C600473724_en_to_es.pdf'
-    filename = 'Invoice_C600473724_en_to_es.pdf'
-    
-    try:
-        with app.open_resource(file_path) as f:
-            return send_file(f, as_attachment=True, attachment_filename=filename)
-    except FileNotFoundError:
-        send('File not found', broadcast=True)
-    except Exception as e:
-        send(f"An error occurred: {e}", broadcast=True)
-   
+    urls = []
     generation_path = "generated"
     if os.path.exists(generation_path):
         for i in data['urls']:
             file_to_upload = os.path.join(os.getcwd(), generation_path, os.path.basename(i))
             object_name = i
             print(file_to_upload,object_name,'\n')
-            # upload_file(s3, file_to_upload, BUCKET_NAME)
+            upload_file(s3, file_to_upload, BUCKET_NAME)
             print("Generating Pre-signed url...")
 
             # Generate a presigned URL for the object
-            # url = create_presigned_url(BUCKET_NAME, object_name)
+            url = create_presigned_url(BUCKET_NAME, object_name)
 
-            # if url:
-            #     print(f"Presigned URL to download {object_name}: {url}")
-            # else:
-            #     print("Failed to generate URL")
-    #create object to store all links and send at once
-    # if allowed_file(filename):
-    #     try:
-    #         os.makedirs(app.config['UPLOAD_FOLDER'],exist_ok=True)
-    #         with open(os.path.join(app.config['UPLOAD_FOLDER'],filename), 'wb') as f:
-    #             f.write(file_data)
-    #         emit('file_received', {'filename': filename, 'message': 'File uploaded successfully!'})
-    #     except Exception as e:
-    #         emit('file_error', {'error': str(e)})
-    # else: 
-    #     emit('file_error', {'error': 'Invalid file type'})
+            if url:
+                print(f"Presigned URL to download {object_name}: {url}")
+                urls.append(url)
+            else:
+                print("Failed to generate URL")
+        if(len(urls)==0):
+            socketio.emit('file_error',{'error': "Couldn't generate urls"})
+        else:
+            socketio.emit('send_aws_urls',{'urls': urls}, to=request.sid)
 
 
 if __name__ == "__main__":

@@ -59,8 +59,14 @@ const Translate: React.FC = () => {
     socket.on('hello', () => console.log('Server Hello Received.'))
 
     socket.on('pdf_ready', (data: { urls: [string] }) => {
-      data.urls.forEach((url) => console.log(`PDF URL ${url} is ready`))
+      data.urls.forEach((url) => console.log(`PDF URL ${url} is ready`));
+      socket.emit('send_urls',{urls: data.urls});
+
       // Handle PDF URL (e.g., display it to the user)
+    });
+
+    socket.on('send_aws_urls', (data:{urls: [string] }) => {
+      data.urls.forEach((url) => console.log(`PDF URL is ${url}`));
     });
 
     socket.on('file_received', () => {
