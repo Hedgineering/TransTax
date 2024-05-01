@@ -1,8 +1,9 @@
 # Set this variable to "threading", "eventlet" or "gevent" to test the
 # different async modes, or leave it set to None for the application to choose
 # the best option based on available packages. see https://stackoverflow.com/a/34598238
-async_mode = None
+# async_mode = None
 
+import sys
 from InvoiceGenerator import generate_invoice
 
 # if async_mode is None:
@@ -28,6 +29,7 @@ from InvoiceGenerator import generate_invoice
 
 # monkey patching is necessary because this application uses a background
 # thread
+
 # if async_mode == "eventlet":
 #     import eventlet
 
@@ -208,10 +210,11 @@ def handle_pdf_generation(request_sid, data):
         "spanish": "es",
     }
 
-    source_language = languages[data["sourceLanguage"]]
-    destination_language = languages[data["destinationLanguage"]]
+    src_language = languages[data["sourceLanguage"]]
+    dest_language = languages[data["destinationLanguage"]]
+    src_currency = data["sourceCurrency"]
+    dest_currency = data["destinationCurrency"]
 
-    
     print(f"\n\nHandle pdf generation for {file_name}\n\n")
 
     # Sanitize the file_name or ensure it's safe before appending it to the path
@@ -234,8 +237,9 @@ def handle_pdf_generation(request_sid, data):
         print('safe file name path exists but is not a file')
         return
 
-    info = generate_invoice(filePath=safe_file_name, fileHeader=0, dest_language=destination_language)
+    info = generate_invoice(filePath=safe_file_name, fileHeader=0, src_language=src_language, dest_language=dest_language, src_currency=src_currency, dest_currency=dest_currency)
     socketio.emit("pdf_ready", {"urls": info}, to=request_sid)
+
 
     # After all PDFs are "generated", notify the client that the job is finished
     # socketio.emit("job_finished", {"message": "All PDFs generated."}, to=request_sid)
@@ -255,9 +259,11 @@ def handle_generate_pdfs(data):
     print("Received request to generate PDFs:", data)
     # Start the PDF generation process in a separate thread to avoid blocking
     # Pass the client's session ID to target messages to the right client
+    # sys.setrecursionlimit(100000)
+    # threading.stack_size(64*4096)
     # threading.Thread(target=handle_pdf_generation, args=(request.sid, data)).start()
-    handle_pdf_generation(request.sid,data)
-    # handle_pdf_generation(request.sid)
+    handle_pdf_generation(request.sid, data)
+
 
 @socketio.on('send_urls')
 def send_url_links(data):
@@ -280,9 +286,9 @@ def send_url_links(data):
             else:
                 print("Failed to generate URL")
         if(len(urls)==0):
-            socketio.emit('file_error',{'error': "Couldn't generate urls"})
+            socketio.emit('file_error', {'error': "Couldn't generate urls"})
         else:
-            socketio.emit('send_aws_urls',{'urls': urls}, to=request.sid)
+            socketio.emit('send_aws_urls', {'urls': urls}, to=request.sid)
 
 
 if __name__ == "__main__":

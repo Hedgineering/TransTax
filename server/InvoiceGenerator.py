@@ -2,13 +2,62 @@ import os
 import argostranslate.package
 import argostranslate.translate
 import jinja2
+import requests
 import numpy as np
 import pandas as pd
-from datetime import date, timedelta, datetime
+from bs4 import BeautifulSoup
+from datetime import date, timedelta
+from functools import cache
+from time import perf_counter
 from weasyprint import HTML
 
+form = {}
+symbol = {
+    "AED": ["Emirati Dirham", "د.إ", "l"],
+    "AUD": ["Australian Dollar", "$", "l"],
+    "CAD": ["Canadian Dollar", "$", "l"],
+    "CNY": ["Chinese Yuan Renminbi","¥", "l"],
+    "EUR": ["Euro", "€", "l"],
+    "GBP": ["British Pound", "£", "l"],
+    "INR": ["Indian Rupee", "₹", "l"],
+    "JPY": ["Japanese Yen", "¥", "l"],
+    "MXN": ["Mexican Peso", "$", "l"],
+    "RUB": ["Russian Ruble", "₽", "l"],
+    "USD": ["US Dollar", "$", "l"],
+    "WON": ["South Korean Won", "₩", "l"],
+}
+fields = [
+    "InvoiceDate",
+    "InvoiceNumber",
+    "DueDate",
+    "CompanyName",
+    "CompanyStreet",
+    "CompanyRegion",
+    "CompanyPhone",
+    "CompanyEmail",
+    "CompanyWebsite",
+    "BillToName",
+    "BillToStreet",
+    "BillToCity",
+    "BillToRegion",
+    "BillToZip",
+    "BillToPhone",
+    "ShipToName",
+    "ShipToStreet",
+    "ShipToCity",
+    "ShipToRegion",
+    "ShipToZip",
+    "ShipToPhone",
+    "Product",
+    "Quantity",
+    "UnitPrice",
+    "TaxRate",
+    "TaxAmount",
+    "Total"
+]
 
 # translates text
+@cache
 def translate(text: str = "", src_language: str = "en", dest_language: str = "en") -> str:
 
     if src_language == dest_language:
@@ -24,11 +73,29 @@ def translate(text: str = "", src_language: str = "en", dest_language: str = "en
     )
     argostranslate.package.install_from_path(package_to_install.download())
 
-    # translate
+    # translate using Argos Translate
     return argostranslate.translate.translate(text, src_language, dest_language)
 
-def translate_wrapper(text, src_language, dest_language):
-    return translate(text, src_language, dest_language)
+
+
+# converts currency
+def convert_currency(amount: float, src_currency: str, dest_currency: str, date: date=date.today()-timedelta(days=1)) -> str:   
+    url = "https://www.x-rates.com/historical/?from=" + src_currency + "&amount=" + str(amount) + "&date=" + str(date)
+    response = requests.get(url)
+    print("got response")
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, "html.parser")
+        extracted_text = soup.get_text()
+        lines = extracted_text.split("\n")
+        try:
+            ind = lines.index(symbol[dest_currency][0])
+            converted_amount = f"{float(lines[ind + 1]):,.2f}"
+        except Exception as e:
+            return -1
+
+    if symbol[dest_currency][2] == "l":
+        return symbol[dest_currency][1] + " " + str(converted_amount)
+    return str(converted_amount) + " " + symbol[dest_currency][1]
 
 
 # read database
@@ -38,23 +105,23 @@ def read_file(
 
     extension = filePath.split(".")[-1].lower()
     column_type = {
-    0: 'datetime64[ns]',  # Datetime
-    1: 'object',           # Object (string)
-    2: 'object',           # Object (string)
-    3: 'object',           # Object (string)
-    4: 'object',           # Object (string)
-    5: 'object',           # Object (string)
-    6: 'object',           # Object (string)
-    7: 'float64',          # Float
-    8: 'float64',          # Float
-    9: 'int64',            # Integer
-    10: 'int64',           # Integer
-    11: 'object',          # Object (string)
-    12: 'object',          # Object (string)
-    13: 'object',          # Object (string)
-    14: 'int64',           # Integer
-    15: 'object'           # Object (string)
-}
+        0: 'datetime64[ns]',  # Datetime
+        1: 'object',           # Object (string)
+        2: 'object',           # Object (string)
+        3: 'object',           # Object (string)
+        4: 'object',           # Object (string)
+        5: 'object',           # Object (string)
+        6: 'object',           # Object (string)
+        7: 'float64',          # Float
+        8: 'float64',          # Float
+        9: 'int64',            # Integer
+        10: 'int64',           # Integer
+        11: 'object',          # Object (string)
+        12: 'object',          # Object (string)
+        13: 'object',          # Object (string)
+        14: 'int64',           # Integer
+        15: 'object'           # Object (string)
+    }
     if extension == "xlsx":
         df = pd.read_excel(filePath, header=fileHeader, dtype=column_type)
     elif extension == "csv":
@@ -75,35 +142,7 @@ def interpolate(df: pd.DataFrame) -> pd.DataFrame:
         filled_df["DueDate"] = filled_df["InvoiceDate"] + timedelta(days=30)
 
     # add missing columns
-    fields = [
-        "InvoiceDate",
-        "InvoiceNumber",
-        "DueDate",
-        "CompanyName",
-        "CompanyStreet",
-        "CompanyRegion",
-        "CompanyPhone",
-        "CompanyEmail",
-        "CompanyWebsite",
-        "BillToName",
-        "BillToStreet",
-        "BillToCity",
-        "BillToRegion",
-        "BillToZip",
-        "BillToPhone",
-        "ShipToName",
-        "ShipToStreet",
-        "ShipToCity",
-        "ShipToRegion",
-        "ShipToZip",
-        "ShipToPhone",
-        "Product",
-        "Quantity",
-        "UnitPrice",
-        "TaxRate",
-        "TaxAmount",
-        "Total"
-    ]
+
     for field in fields:
         if field not in filled_df.columns:
             filled_df[field] = None
@@ -159,7 +198,6 @@ def interpolate(df: pd.DataFrame) -> pd.DataFrame:
         .sum(axis=1)
         == 1
     )
-
     def fill_missing_price(row):
         filled_row = row
         if pd.isna(row["Total"]):
@@ -173,7 +211,6 @@ def interpolate(df: pd.DataFrame) -> pd.DataFrame:
         elif pd.isna(row["UnitPrice"]):
             filled_row["UnitPrice"] = row["Total"] / ((1 + row["TaxRate"]) * row["Quantity"])
         return filled_row
-
     filled_df.loc[
         mask, ["UnitPrice", "Quantity", "TaxRate", "TaxAmount", "Total"]
     ] = filled_df.loc[
@@ -187,10 +224,10 @@ def interpolate(df: pd.DataFrame) -> pd.DataFrame:
 
 def create_pdf(
     df: pd.DataFrame,
-    i: int,
-    logo: str = "https://1000logos.net/wp-content/uploads/2019/03/IEEE-Logo.jpg",
     src_language: str = "en",
-    dest_language: str = "en"
+    dest_language: str = "en",
+    src_currency: str = "USD",
+    dest_currency: str = "USD",
 ) -> None:
 
     cwd: str = os.getcwd()
@@ -203,8 +240,34 @@ def create_pdf(
     base_filename = f"Invoice_{df.loc[0]["InvoiceNumber"]}_{src_language}_to_{dest_language}.pdf"
     safe_filename = os.path.join(cwd, generation_path, os.path.basename(base_filename))
 
+    # total = df["Total"].sum()
+    mySum = df["Total"].sum()
+    total = convert_currency(mySum, src_currency, dest_currency)
+
+    df["UnitPrice"] = df["UnitPrice"].apply(convert_currency, args=(src_currency, dest_currency))
+    df["Total"] = df["Total"].apply(convert_currency, args=(src_currency, dest_currency))
+    
+
+
     # write pdf
     row1 = df.loc[0]
+
+    """
+    form = {}
+    form["InvoiceDate"] = translate("Invoice Date:", "en", dest_language)
+    form["InvoiceNumber"] = translate("Invoice Number:", "en", dest_language)
+    form["Quantity"] = translate("Quantity", "en", dest_language)
+    form["Description"] = translate("Description", "en", dest_language)
+    form["UnitPrice"] = translate("Unit Price", "en", dest_language)
+    form["TaxRate"] = translate("Tax Rate", "en", dest_language)
+    form["Subtotal"] = translate("Subtotal", "en", dest_language)
+    form["PaymentInfo"] = translate("Payment Information", "en", dest_language)
+    form["DueDate"] = translate("Due Date", "en", dest_language)
+    form["TotalDue"] = translate("Total Due", "en", dest_language)
+    form["AccountNumber"] = translate("Account Number", "en", dest_language)
+    form["RoutingNumber"] = translate("Routing Number", "en", dest_language)
+    """
+    t0 = perf_counter()
     form = {
         "InvoiceDate": translate("Invoice Date:", "en", dest_language),
         "InvoiceNumber": translate("Invoice Number:", "en", dest_language),
@@ -248,6 +311,7 @@ def create_pdf(
         "ShipToZip": row1["ShipToZip"],
         "ShipToPhone": row1["ShipToPhone"]
     }
+    t1 = perf_counter()
 
     # form = {
     #     "InvoiceDate": "Invoice Date:",
@@ -315,12 +379,19 @@ def create_pdf(
                                   billing_info=billing_info, 
                                   shipping_info=shipping_info, 
                                   product_info=product_info,
-                                  total=df["Total"].sum())
+                                  total=total)
 
+    t2 = perf_counter()
 
     with open(safe_filename, "wb") as pdf_file:
         HTML(string=html_output, base_url="https://fonts.googleapis.com").write_pdf(pdf_file)
 
+    t3 = perf_counter()
+
+    print(f"Total time: {t3 - t0}")
+    print(f"Translation time: {t1 - t0}")
+    print(f"Template render time: {t2 - t1}")
+    print(f"PDF generation time: {t3 - t2}")
 
 def generate_invoice(**kwargs) -> list[str]:
     if "filePath" in kwargs:
@@ -356,6 +427,14 @@ def generate_invoice(**kwargs) -> list[str]:
         dest_language: str = kwargs["dest_language"]
     else:
         dest_language: str = "en"
+    if "src_currency" in kwargs:
+        src_currency: str = kwargs["src_currency"]
+    else:
+        src_currency: str = "USD"
+    if "dest_currency" in kwargs:
+        dest_currency: str = kwargs["dest_currency"]
+    else:
+        dest_currency: str = "USD"
 
     # interpolate missing values
     df = interpolate(df)
@@ -375,7 +454,7 @@ def generate_invoice(**kwargs) -> list[str]:
     for i, (_, group) in enumerate(grouped):
         try:
             group = group.reset_index()
-            create_pdf(group, i, src_language=src_language, dest_language=dest_language)
+            create_pdf(group, src_language=src_language, dest_language=dest_language, src_currency=src_currency, dest_currency=dest_currency)
             print(f"Invoice {i + 1}, # {group.loc[0]["InvoiceNumber"]} created, translating from {src_language} to {dest_language}")
         except Exception as e:
             print(f"Invoice {i + 1}, # {group.loc[0]["InvoiceNumber"]}, failed!\n{e}\n")
@@ -385,4 +464,4 @@ def generate_invoice(**kwargs) -> list[str]:
 
 
 if __name__ == "__main__":
-    generate_invoice(filePath="AE Sample data.xlsx", fileHeader=0, src_language="en", dest_language="ja")
+    generate_invoice(filePath="AE Sample data.xlsx", fileHeader=0, src_language="en", dest_language="ja", src_currency="USD", dest_currency="JPY")

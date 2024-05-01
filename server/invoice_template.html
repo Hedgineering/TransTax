@@ -180,9 +180,9 @@
         <tr>
             <td>{{ product["Quantity"] }}</td>
             <td>{{ product["Product"] }}</td>
-            <td>{{ "$%0.2f" | format(product["UnitPrice"] | float) }}</td>
+            <td>{{ product["UnitPrice"] }}</td>
             <td>{{ "%0.2f" | format(product["TaxRate"]*100 | float) }}%</td>
-            <td>{{ "$%0.2f" | format(product["Quantity"] * product["UnitPrice"] * product["TaxRate"] | float) }}</td>
+            <td>{{ product["Total"] }}</td>
         </tr>
         {% endfor %}
 
@@ -212,7 +212,7 @@
             </td>
             <td class="large">{{ invoice_info["DueDate"].strftime("%Y-%m-%d") }}</td>
 
-            <td class="large total">{{ "$%0.2f" | format(total | float) }}</td>
+            <td class="large total">{{ total }}</td>
         </tr>
     </tbody>
 </table>

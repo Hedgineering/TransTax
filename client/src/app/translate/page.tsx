@@ -134,10 +134,18 @@ const Translate: React.FC = () => {
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
             >
               <option value="">Select Currency</option>
-              <option value="JPY">Japanese Yen</option>
-              <option value="SAR">Saudi Riyal</option>
-              <option value="AED">UAE Dirham</option>
               <option value="USD">US Dollar</option>
+              <option value="AUD">Australian Dollar</option>
+              <option value="GBP">British Pound</option>
+              <option value="CAD">Canadian Dollar</option>
+              <option value="CNY">Chinese Yuan Renminbi</option>
+              <option value="AED">Emirati Dirham</option>
+              <option value="EUR">Euro</option>
+              <option value="INR">Indian Rupee</option>
+              <option value="JPY">Japanese Yen</option>
+              <option value="MXN">Mexican Peso</option>
+              <option value="RUB">Russian Ruble</option>
+              <option value="WON">South Korean Won</option>
             </select>
           </div>
           <div>
@@ -170,10 +178,18 @@ const Translate: React.FC = () => {
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
             >
               <option value="">Select Currency</option>
-              <option value="JPY">Japanese Yen</option>
-              <option value="SAR">Saudi Riyal</option>
-              <option value="AED">UAE Dirham</option>
               <option value="USD">US Dollar</option>
+              <option value="AUD">Australian Dollar</option>
+              <option value="GBP">British Pound</option>
+              <option value="CAD">Canadian Dollar</option>
+              <option value="CNY">Chinese Yuan Renminbi</option>
+              <option value="AED">Emirati Dirham</option>
+              <option value="EUR">Euro</option>
+              <option value="INR">Indian Rupee</option>
+              <option value="JPY">Japanese Yen</option>
+              <option value="MXN">Mexican Peso</option>
+              <option value="RUB">Russian Ruble</option>
+              <option value="WON">South Korean Won</option>
             </select>
           </div>
           <div>
